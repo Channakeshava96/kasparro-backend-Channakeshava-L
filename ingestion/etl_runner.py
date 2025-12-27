@@ -4,6 +4,9 @@ from ingestion.api_ingestion import fetch_coinpaprika_data
 from ingestion.csv_ingestion import read_csv_data
 from ingestion.transform import transform_api_record, transform_csv_record
 from datetime import datetime, UTC
+from ingestion.csv_alt_ingestion import read_alt_csv_data
+from ingestion.transform import transform_alt_csv_record
+
 
 def run_etl():
     db = SessionLocal()
@@ -46,9 +49,27 @@ def run_etl():
                 timestamp=normalized.timestamp
             ).first():
                 db.add(NormalizedPrice(**normalized.model_dump()))
+        # --- ALT CSV INGESTION ---
+        alt_csv_rows = read_alt_csv_data()
+
+        for row in alt_csv_rows:
+            db.add(RawCSVData(
+                source="csv_alt",
+                raw_payload=row
+            ))
+
+            normalized = transform_alt_csv_record(row)
+
+            if not db.query(NormalizedPrice).filter_by(
+                coin=normalized.coin,
+                source=normalized.source,
+                timestamp=normalized.timestamp
+            ).first():
+                db.add(NormalizedPrice(**normalized.model_dump()))
+
 
         etl_run.status = "SUCCESS"
-        etl_run.records_processed = len(api_data[:5]) + len(csv_rows)
+        etl_run.records_processed = len(api_data[:5]) + len(csv_rows) + len(alt_csv_rows)
         etl_run.finished_at = datetime.now(UTC)
 
         db.commit()

@@ -18,3 +18,14 @@ def transform_csv_record(record: dict):
         source="csv",
         timestamp=datetime.fromisoformat(record["timestamp"])
     )
+def transform_alt_csv_record(record: dict):
+    return NormalizedPriceSchema(
+        coin=record["symbol"],
+        price_usd=float(record["price"]),
+        volume_24h=None,  # missing in this source
+        source="csv_alt",
+        timestamp=datetime.strptime(
+            record["timestamp"],
+            "%d-%m-%Y %H:%M"
+        )
+    )
