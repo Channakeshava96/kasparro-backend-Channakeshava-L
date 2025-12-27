@@ -67,3 +67,10 @@ class ETLRun(Base):
     started_at = Column(DateTime(timezone=True), server_default=func.now())
     finished_at = Column(DateTime(timezone=True), nullable=True)
     error_message = Column(String, nullable=True)
+class ETLCheckpoint(Base):
+    __tablename__ = "etl_checkpoints"
+
+    id = Column(Integer, primary_key=True)
+    source = Column(String, nullable=False, unique=True)
+    last_processed_at = Column(DateTime(timezone=True), nullable=True)
+
