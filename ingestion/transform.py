@@ -7,7 +7,7 @@ def transform_api_record(record: dict):
         price_usd=record["quotes"]["USD"]["price"],
         volume_24h=record["quotes"]["USD"].get("volume_24h"),
         source="coinpaprika",
-        timestamp=datetime.fromisoformat(record["last_updated"]) 
+        timestamp=datetime.fromisoformat(record["last_updated"]).replace(tzinfo=UTC) 
     )
 
 def transform_csv_record(record: dict):
@@ -16,7 +16,7 @@ def transform_csv_record(record: dict):
         price_usd=float(record["price_usd"]),
         volume_24h=float(record["volume_24h"]),
         source="csv",
-        timestamp=datetime.fromisoformat(record["timestamp"])
+        timestamp=datetime.fromisoformat(record["timestamp"]).replace(tzinfo=UTC)
     )
 def transform_alt_csv_record(record: dict):
     return NormalizedPriceSchema(
@@ -27,5 +27,5 @@ def transform_alt_csv_record(record: dict):
         timestamp=datetime.strptime(
             record["timestamp"],
             "%d-%m-%Y %H:%M"
-        )
+        ).replace(tzinfo=UTC)
     )

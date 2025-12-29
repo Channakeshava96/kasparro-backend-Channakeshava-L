@@ -4,6 +4,7 @@ import uuid
 
 from api.data import router as data_router
 from api.health import router as health_router
+from api.stats import router as stats_router
 
 app = FastAPI(title="Kasparro Backend API")
 
@@ -25,3 +26,4 @@ async def add_request_metadata(request: Request, call_next):
 
 app.include_router(data_router)
 app.include_router(health_router)
+app.include_router(stats_router)
